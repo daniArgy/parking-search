@@ -1,0 +1,17 @@
+# Exclude development and environment files from the final bundle
+.idea/
+.vscode/
+.git/
+node_modules/
+**/node_modules/
+backend/tests/
+backend/vendor/
+backend/phpunit.xml
+Dockerfile
+docker-compose.yml
+*.md
+.gitignore
+.vercelignore
+# We need frontend/build, but we don't need frontend/src in the lambda function bundle
+# However, .vercelignore applies to what Vercel SEES from Git. 
+# We need src to build. So we can't ignore it here.

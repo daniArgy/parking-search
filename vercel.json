@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "cd frontend && npm install && npm run build && rm -rf node_modules",
   "outputDirectory": "frontend/build",
   "framework": "create-react-app",
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.7.2"
+      "runtime": "vercel-php@0.7.2",
+      "includeFiles": "backend/src/**, backend/public/index.php"
     }
   },
   "routes": [

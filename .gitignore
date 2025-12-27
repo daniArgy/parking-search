@@ -32,3 +32,4 @@ logs/
 coverage/
 .phpunit.result.cache
 PROJECT_SUMMARY.txt
+backend/public/.htaccess
