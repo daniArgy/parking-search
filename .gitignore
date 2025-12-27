@@ -31,3 +31,4 @@ logs/
 # Test coverage
 coverage/
 .phpunit.result.cache
+PROJECT_SUMMARY.txt
