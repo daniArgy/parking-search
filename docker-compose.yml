@@ -1,0 +1,34 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: parking-backend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend/cache:/var/www/html/cache
+    environment:
+      - PHP_MEMORY_LIMIT=256M
+    networks:
+      - parking-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=http://localhost:8080/api
+    container_name: parking-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - parking-network
+    restart: unless-stopped
+
+networks:
+  parking-network:
+    driver: bridge

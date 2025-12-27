@@ -1,0 +1,21 @@
+{
+    "name": "parking-search/backend",
+    "description": "Backend API para búsqueda de parkings en Vigo",
+    "type": "project",
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "ParkingSearch\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ParkingSearch\\Tests\\": "tests/"
+        }
+    }
+}
