@@ -116,3 +116,27 @@ body {
 .animate-slide-in-right {
   animation: slideInRight 0.5s ease-out forwards;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  :root {
+    --radius: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-panel {
+    padding: 16px !important;
+  }
+  
+  .btn-premium {
+    padding: 10px 16px !important;
+    font-size: 14px;
+    gap: 6px;
+  }
+}
+
+/* Transition for collapsible elements */
+.content-transition {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
