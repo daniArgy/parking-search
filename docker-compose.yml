@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./backend/cache:/var/www/html/cache
+      - ./backend:/var/www/html
     environment:
       - PHP_MEMORY_LIMIT=256M
     networks:
