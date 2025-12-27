@@ -1,17 +1,17 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "composer install --working-dir=backend && cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/build",
   "framework": "create-react-app",
   "functions": {
-    "backend/public/index.php": {
+    "api/index.php": {
       "runtime": "vercel-php@0.7.2"
     }
   },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/public/index.php"
+      "dest": "api/index.php"
     },
     {
       "src": "/static/(.*)",
