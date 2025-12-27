@@ -1,6 +1,22 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+// Manual PSR-4 Autoloader (bypassing composer for Vercel compatibility)
+spl_autoload_register(function ($class) {
+    $prefix = 'ParkingSearch\\';
+    $base_dir = __DIR__ . '/../src/';
+
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+
+    if (file_exists($file)) {
+        require_once $file;
+    }
+});
 
 use ParkingSearch\Infrastructure\FileCache;
 use ParkingSearch\Infrastructure\VigoParkingRepository;
