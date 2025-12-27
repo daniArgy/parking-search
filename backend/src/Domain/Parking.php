@@ -11,6 +11,7 @@ class Parking
     private int $plazasLibres;
     private int $plazasTotales;
     private string $direccion;
+    private float $ocupacion;
 
     public function __construct(
         string $id,
@@ -19,7 +20,8 @@ class Parking
         float $longitud,
         int $plazasLibres,
         int $plazasTotales,
-        string $direccion
+        string $direccion,
+        float $ocupacion = 0.0
     ) {
         $this->id = $id;
         $this->nombre = $nombre;
@@ -28,6 +30,7 @@ class Parking
         $this->plazasLibres = $plazasLibres;
         $this->plazasTotales = $plazasTotales;
         $this->direccion = $direccion;
+        $this->ocupacion = $ocupacion;
     }
 
     public function getId(): string
@@ -65,8 +68,17 @@ class Parking
         return $this->direccion;
     }
 
+    public function getOcupacion(): float
+    {
+        return $this->ocupacion;
+    }
+
     public function getPorcentajeOcupacion(): float
     {
+        if ($this->ocupacion > 0) {
+            return $this->ocupacion;
+        }
+
         if ($this->plazasTotales === 0) {
             return 0.0;
         }
@@ -83,6 +95,7 @@ class Parking
             'plazasLibres' => $this->plazasLibres,
             'plazasTotales' => $this->plazasTotales,
             'direccion' => $this->direccion,
+            'ocupacion' => $this->ocupacion,
             'porcentajeOcupacion' => $this->getPorcentajeOcupacion()
         ];
     }

@@ -6,6 +6,7 @@ export interface Parking {
   plazasLibres: number;
   plazasTotales: number;
   direccion: string;
+  ocupacion: number;
   porcentajeOcupacion: number;
 }
 

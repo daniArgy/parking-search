@@ -86,13 +86,14 @@ class VigoParkingRepository implements ParkingRepositoryInterface
         foreach ($data as $item) {
             try {
                 $parkings[] = new Parking(
-                    id: (string)($item['id'] ?? uniqid()),
+                    id: (string)($item['id'] ?? $item['id_parking'] ?? uniqid()),
                     nombre: (string)($item['nombre'] ?? 'Parking sin nombre'),
-                    latitud: (float)($item['latitud'] ?? $item['location']['coordinates'][1] ?? 0),
-                    longitud: (float)($item['longitud'] ?? $item['location']['coordinates'][0] ?? 0),
-                    plazasLibres: (int)($item['plazas_libres'] ?? 0),
-                    plazasTotales: (int)($item['plazas_totales'] ?? 0),
-                    direccion: (string)($item['direccion'] ?? '')
+                    latitud: (float)($item['lat'] ?? 0),
+                    longitud: (float)($item['lon'] ?? 0),
+                    plazasLibres: (int)($item['plazaslibres'] ?? 0),
+                    plazasTotales: (int)($item['totalplazas'] ?? 0),
+                    direccion: (string)($item['direccion'] ?? ''),
+                    ocupacion: (float)($item['ocupacion'] ?? 0)
                 );
             } catch (\Exception $e) {
                 // Skip invalid entries
