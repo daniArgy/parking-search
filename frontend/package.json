@@ -33,6 +33,11 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-leaflet|@react-leaflet)/)"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
