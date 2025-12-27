@@ -3,6 +3,7 @@ import MapComponent from './components/MapComponent';
 import SearchBar from './components/SearchBar';
 import ParkingDetail from './components/ParkingDetail';
 import ParkingList from './components/ParkingList';
+import Notification from './components/Notification';
 import { parkingService } from './services/parkingService';
 import { Parking } from './types/Parking';
 import './App.css';
@@ -13,10 +14,20 @@ function App() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   useEffect(() => {
     loadParkings();
   }, []);
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const loadParkings = async () => {
     setLoading(true);
@@ -27,7 +38,7 @@ function App() {
 
   const handleGeolocate = () => {
     if (!navigator.geolocation) {
-      alert('La geolocalización no está soportada por tu navegador');
+      setNotification({ message: 'La geolocalización no está soportada por tu navegador', type: 'error' });
       return;
     }
 
@@ -35,11 +46,12 @@ function App() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setUserLocation([position.coords.latitude, position.coords.longitude]);
+        setNotification({ message: 'Ubicación obtenida correctamente', type: 'success' });
         setIsLocating(false);
       },
       (error) => {
         console.error('Error al obtener ubicación:', error);
-        alert('No se pudo obtener tu ubicación. Por favor, permite el acceso a la ubicación.');
+        setNotification({ message: 'No se pudo obtener tu ubicación. Por favor, permite el acceso a la ubicación.', type: 'error' });
         setIsLocating(false);
       }
     );
@@ -54,8 +66,9 @@ function App() {
     
     if (filtered.length > 0) {
       setSelectedParking(filtered[0]);
+      setNotification({ message: `Encontrado: ${filtered[0].nombre}`, type: 'success' });
     } else {
-      alert('No se encontraron parkings con ese criterio de búsqueda');
+      setNotification({ message: 'No se encontraron parkings con ese criterio de búsqueda', type: 'info' });
     }
   };
 
@@ -94,6 +107,13 @@ function App() {
             <ParkingDetail
               parking={selectedParking}
               onClose={() => setSelectedParking(null)}
+            />
+          )}
+          {notification && (
+            <Notification
+              message={notification.message}
+              type={notification.type}
+              onClose={() => setNotification(null)}
             />
           )}
         </>

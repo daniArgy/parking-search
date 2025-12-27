@@ -12,6 +12,7 @@ class VigoParkingRepository implements ParkingRepositoryInterface
     private const CACHE_TTL = 300; // 5 minutes
 
     private CacheInterface $cache;
+    private array $parkingsIndex = [];
 
     public function __construct(CacheInterface $cache)
     {
@@ -21,20 +22,30 @@ class VigoParkingRepository implements ParkingRepositoryInterface
     public function getAllParkings(): array
     {
         $data = $this->fetchParkingData();
-        return $this->mapToParkings($data);
+        $parkings = $this->mapToParkings($data);
+        $this->buildIndex($parkings);
+        return $parkings;
     }
 
     public function getParkingById(string $id): ?Parking
     {
+        // Try to use cached index for fast lookup
+        if (isset($this->parkingsIndex[$id])) {
+            return $this->parkingsIndex[$id];
+        }
+
+        // If index is empty, rebuild it
         $parkings = $this->getAllParkings();
         
+        return $this->parkingsIndex[$id] ?? null;
+    }
+
+    private function buildIndex(array $parkings): void
+    {
+        $this->parkingsIndex = [];
         foreach ($parkings as $parking) {
-            if ($parking->getId() === $id) {
-                return $parking;
-            }
+            $this->parkingsIndex[$parking->getId()] = $parking;
         }
-        
-        return null;
     }
 
     private function fetchParkingData(): array
