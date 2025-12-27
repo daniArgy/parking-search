@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Parking, ApiResponse } from '../types/Parking';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 export const parkingService = {
   async getAllParkings(): Promise<Parking[]> {

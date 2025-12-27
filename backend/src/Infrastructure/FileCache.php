@@ -9,7 +9,7 @@ class FileCache implements CacheInterface
     public function __construct(string $cacheDir = __DIR__ . '/../../cache')
     {
         $this->cacheDir = $cacheDir;
-        if (!file_exists($this->cacheDir)) {
+        if ($this->cacheDir !== '/tmp' && !file_exists($this->cacheDir)) {
             mkdir($this->cacheDir, 0755, true);
         }
     }

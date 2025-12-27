@@ -18,8 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// Detect Vercel environment
+$isVercel = getenv('VERCEL') === '1';
+$cacheDir = $isVercel ? '/tmp' : __DIR__ . '/../cache';
+
 // Dependency injection
-$cache = new FileCache();
+$cache = new FileCache($cacheDir);
 $repository = new VigoParkingRepository($cache);
 $getAllParkingsUseCase = new GetAllParkingsUseCase($repository);
 $getParkingByIdUseCase = new GetParkingByIdUseCase($repository);
