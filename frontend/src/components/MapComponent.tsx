@@ -10,6 +10,7 @@ interface MapComponentProps {
   selectedParking: Parking | null;
   onParkingSelect: (parking: Parking) => void;
   userLocation: [number, number] | null;
+  searchLocation: [number, number] | null;
 }
 
 // Fix for default marker icon in Leaflet with React
@@ -48,16 +49,17 @@ const MapComponent: React.FC<MapComponentProps> = ({
   parkings,
   selectedParking,
   onParkingSelect,
-  userLocation
+  userLocation,
+  searchLocation
 }) => {
   const defaultCenter: [number, number] = [42.2406, -8.7207]; // Vigo center
   const defaultZoom = 13;
   
   const center = selectedParking
     ? [selectedParking.latitud, selectedParking.longitud] as [number, number]
-    : userLocation || defaultCenter;
+    : searchLocation || userLocation || defaultCenter;
 
-  const zoom = selectedParking ? 16 : defaultZoom;
+  const zoom = (selectedParking || searchLocation || userLocation) ? 16 : defaultZoom;
 
   return (
     <div style={{ height: '100%', width: '100%' }}>
