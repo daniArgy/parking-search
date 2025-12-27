@@ -7,7 +7,7 @@ use ParkingSearch\Domain\ParkingRepositoryInterface;
 
 class VigoParkingRepository implements ParkingRepositoryInterface
 {
-    private const API_URL = 'https://datos.vigo.org/resource/tpak-v6si.json';
+    private const API_URL = 'https://datos.vigo.org/data/trafico/parkings-ocupacion.json';
     private const CACHE_KEY = 'vigo_parkings';
     private const CACHE_TTL = 300; // 5 minutes
 
