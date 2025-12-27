@@ -7,37 +7,43 @@ interface NotificationProps {
 }
 
 const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) => {
-  const backgroundColor = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6';
+  const color = type === 'error' ? 'var(--danger)' : type === 'success' ? 'var(--secondary)' : 'var(--primary)';
+  const icon = type === 'error' ? '🚫' : type === 'success' ? '✨' : 'ℹ️';
 
   return (
-    <div style={{
+    <div className="glass-panel animate-slide-up" style={{
       position: 'fixed',
-      top: '20px',
+      bottom: '24px',
       left: '50%',
       transform: 'translateX(-50%)',
-      backgroundColor,
-      color: 'white',
-      padding: '12px 24px',
-      borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      padding: '12px 20px',
       zIndex: 10000,
       display: 'flex',
       alignItems: 'center',
       gap: '12px',
-      maxWidth: '90%'
+      maxWidth: '90%',
+      borderLeft: `4px solid ${color}`,
     }}>
-      <span>{message}</span>
+      <span style={{ fontSize: '18px' }}>{icon}</span>
+      <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>{message}</span>
       <button
         onClick={onClose}
         style={{
-          background: 'rgba(255, 255, 255, 0.3)',
+          background: 'rgba(0,0,0,0.05)',
           border: 'none',
-          color: 'white',
-          borderRadius: '4px',
-          padding: '4px 8px',
+          color: 'var(--text-muted)',
+          borderRadius: '50%',
+          width: '24px',
+          height: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           cursor: 'pointer',
-          fontWeight: 'bold'
+          fontSize: '14px',
+          transition: 'all 0.2s ease'
         }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.1)'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)'}
       >
         ×
       </button>

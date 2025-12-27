@@ -17,42 +17,48 @@ const SearchBar: React.FC<SearchBarProps> = ({ onGeolocate, onSearch, isLocating
   };
 
   return (
-    <div style={{
+    <div className="glass-panel animate-slide-up" style={{
       position: 'absolute',
-      top: '20px',
-      left: '20px',
+      top: '24px',
+      left: '24px',
       zIndex: 1000,
       display: 'flex',
-      gap: '8px',
+      gap: '12px',
+      padding: '12px',
       flexWrap: 'wrap',
-      maxWidth: 'calc(100% - 360px)',
+      maxWidth: 'calc(100% - 48px)',
     }}>
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
-        <input
-          type="text"
-          placeholder="Buscar dirección en Vigo..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            padding: '12px 16px',
-            fontSize: '14px',
-            border: '1px solid #ddd',
-            borderRadius: '6px',
-            width: '280px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-          }}
-        />
+      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '12px', flex: 1 }}>
+        <div style={{ position: 'relative', flex: 1 }}>
+          <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
+          <input
+            type="text"
+            placeholder="Buscar dirección en Vigo..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              padding: '12px 16px 12px 42px',
+              fontSize: '15px',
+              border: '1px solid rgba(0,0,0,0.05)',
+              borderRadius: '12px',
+              width: '100%',
+              minWidth: '240px',
+              backgroundColor: 'rgba(255,255,255,0.5)',
+              fontFamily: 'inherit',
+              outline: 'none',
+              transition: 'all 0.3s ease'
+            }}
+            onFocus={(e) => e.target.style.backgroundColor = 'white'}
+            onBlur={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.5)'}
+          />
+        </div>
         <button
           type="submit"
+          className="btn-premium"
           style={{
-            padding: '12px 20px',
-            backgroundColor: '#2563eb',
+            padding: '0 24px',
+            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
             color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
           }}
         >
           Buscar
@@ -62,22 +68,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ onGeolocate, onSearch, isLocating
       <button
         onClick={onGeolocate}
         disabled={isLocating}
+        className="btn-premium"
         style={{
-          padding: '12px 20px',
-          backgroundColor: isLocating ? '#9ca3af' : '#10b981',
+          padding: '0 24px',
+          background: isLocating ? '#9ca3af' : 'linear-gradient(135deg, var(--secondary) 0%, #059669 100%)',
           color: 'white',
-          border: 'none',
-          borderRadius: '6px',
           cursor: isLocating ? 'not-allowed' : 'pointer',
-          fontWeight: 'bold',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}
       >
-        <span>📍</span>
-        <span>{isLocating ? 'Ubicando...' : 'Mi ubicación'}</span>
+        <span>{isLocating ? '⌛' : '📍'}</span>
+        <span style={{ display: 'inline-block' }}>{isLocating ? 'Ubicando...' : 'Mi ubicación'}</span>
       </button>
     </div>
   );

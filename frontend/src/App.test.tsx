@@ -9,6 +9,7 @@ test('Parking type is properly defined', () => {
     plazasLibres: 50,
     plazasTotales: 100,
     direccion: 'Test Address',
+    ocupacion: 50,
     porcentajeOcupacion: 50
   };
   

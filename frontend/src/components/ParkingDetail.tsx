@@ -15,85 +15,112 @@ const ParkingDetail: React.FC<ParkingDetailProps> = ({ parking, onClose }) => {
     window.open(url, '_blank');
   };
 
-  const color = getOccupancyColor(parking.porcentajeOcupacion);
+  const statusColor = getOccupancyColor(parking.porcentajeOcupacion);
 
   return (
-    <div style={{
+    <div className="glass-panel animate-slide-in-right" style={{
       position: 'absolute',
-      top: '20px',
-      right: '20px',
-      width: '320px',
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      padding: '20px',
-      zIndex: 1000,
-      maxHeight: 'calc(100vh - 40px)',
-      overflowY: 'auto'
+      top: '24px',
+      right: '24px',
+      width: '360px',
+      padding: '28px',
+      zIndex: 1100,
+      maxHeight: 'calc(100vh - 48px)',
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <h2 style={{ margin: 0, fontSize: '20px' }}>{parking.nombre}</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+        <div>
+          <h2 style={{ margin: '0 0 6px 0', fontSize: '24px', fontWeight: 700, lineHeight: 1.2 }}>
+            {parking.nombre}
+          </h2>
+          <div style={{ fontSize: '14px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>📍</span>
+            {parking.direccion || 'Vigo, España'}
+          </div>
+        </div>
         <button
           onClick={onClose}
+          className="btn-premium"
           style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            color: '#666'
+            background: 'rgba(0,0,0,0.05)',
+            color: 'var(--text-main)',
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            padding: 0,
+            fontSize: '20px'
           }}
         >
           ×
         </button>
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{
-          padding: '12px',
-          borderRadius: '6px',
-          backgroundColor: color,
-          color: 'white',
-          textAlign: 'center',
-          marginBottom: '12px'
-        }}>
-          <div style={{ fontSize: '14px', marginBottom: '4px' }}>{getOccupancyLabel(parking.porcentajeOcupacion)}</div>
-          <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{parking.porcentajeOcupacion.toFixed(0)}%</div>
+      <div style={{ 
+        background: `linear-gradient(135deg, ${statusColor} 0%, ${statusColor}dd 100%)`,
+        padding: '24px',
+        borderRadius: '16px',
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: '24px',
+        boxShadow: `0 12px 24px -6px ${statusColor}66`
+      }}>
+        <div style={{ fontSize: '14px', fontWeight: 600, opacity: 0.9, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+          {getOccupancyLabel(parking.porcentajeOcupacion)}
         </div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: '4px' }}>
+          <span style={{ fontSize: '48px', fontWeight: 800 }}>{parking.porcentajeOcupacion.toFixed(0)}</span>
+          <span style={{ fontSize: '20px', fontWeight: 600, opacity: 0.8 }}>% de ocupación</span>
+        </div>
+      </div>
 
-        <div style={{ marginBottom: '12px' }}>
-          <p style={{ margin: '8px 0', fontSize: '14px' }}>
-            <strong>Plazas libres:</strong> {parking.plazasLibres}
-          </p>
-          <p style={{ margin: '8px 0', fontSize: '14px' }}>
-            <strong>Total de plazas:</strong> {parking.plazasTotales}
-          </p>
-          <p style={{ margin: '8px 0', fontSize: '14px' }}>
-            <strong>Dirección:</strong> {parking.direccion || 'No disponible'}
-          </p>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: '1fr 1fr', 
+        gap: '16px', 
+        marginBottom: '32px' 
+      }}>
+        <div style={{ 
+          background: 'rgba(255,255,255,0.4)', 
+          padding: '16px', 
+          borderRadius: '12px',
+          border: '1px solid rgba(0,0,0,0.03)'
+        }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Libres</div>
+          <div style={{ fontSize: '20px', fontWeight: 700 }}>{parking.plazasLibres}</div>
+        </div>
+        <div style={{ 
+          background: 'rgba(255,255,255,0.4)', 
+          padding: '16px', 
+          borderRadius: '12px',
+          border: '1px solid rgba(0,0,0,0.03)'
+        }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Totales</div>
+          <div style={{ fontSize: '20px', fontWeight: 700 }}>{parking.plazasTotales}</div>
         </div>
       </div>
 
       <button
         onClick={handleGetDirections}
+        className="btn-premium"
         style={{
           width: '100%',
-          padding: '12px',
-          backgroundColor: '#2563eb',
+          padding: '16px',
+          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
           color: 'white',
-          border: 'none',
-          borderRadius: '6px',
           fontSize: '16px',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px'
         }}
       >
         <span>🗺️</span>
-        <span>Cómo llegar</span>
+        <span>Abrir en Google Maps</span>
       </button>
+
+      <div style={{ marginTop: 'auto', paddingTop: '24px', textAlign: 'center' }}>
+        <p style={{ fontSize: '11px', color: 'var(--text-muted)', opacity: 0.7 }}>
+          Datos actualizados cada 5 minutos
+        </p>
+      </div>
     </div>
   );
 };
