@@ -155,12 +155,6 @@ function App() {
             onParkingSelect={setSelectedParking}
             selectedParking={selectedParking}
           />
-          {selectedParking && (
-            <ParkingDetail
-              parking={selectedParking}
-              onClose={() => setSelectedParking(null)}
-            />
-          )}
           {notification && (
             <Notification
               message={notification.message}

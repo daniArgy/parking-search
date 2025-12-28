@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Parking } from '../types/Parking';
-import { getOccupancyColor } from '../utils/parkingUtils';
+import { getOccupancyColor, getOccupancyLabel } from '../utils/parkingUtils';
 import 'leaflet/dist/leaflet.css';
 
 interface MapComponentProps {
@@ -54,7 +54,25 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
   const defaultCenter: [number, number] = [42.2406, -8.7207]; // Vigo center
   const defaultZoom = 13;
+  const markerRefs = React.useRef<{ [key: string]: L.Marker | null }>({});
   
+  const handleGetDirections = (parking: Parking) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${parking.latitud},${parking.longitud}`;
+    window.open(url, '_blank');
+  };
+
+  useEffect(() => {
+    if (selectedParking && markerRefs.current[selectedParking.id]) {
+      const marker = markerRefs.current[selectedParking.id];
+      if (marker) {
+        // Small timeout to allow MapUpdater to finish panning/zooming
+        setTimeout(() => {
+          marker.openPopup();
+        }, 100);
+      }
+    }
+  }, [selectedParking]);
+
   const center = selectedParking
     ? [selectedParking.latitud, selectedParking.longitud] as [number, number]
     : searchLocation || userLocation || defaultCenter;
@@ -81,42 +99,73 @@ const MapComponent: React.FC<MapComponentProps> = ({
           </Marker>
         )}
 
-        {parkings.map((parking) => (
-          <Marker
-            key={parking.id}
-            position={[parking.latitud, parking.longitud]}
-            icon={createCustomIcon(getOccupancyColor(parking.porcentajeOcupacion))}
-            eventHandlers={{
-              click: () => onParkingSelect(parking)
-            }}
-          >
-            <Popup>
-              <div>
-                <h3 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>{parking.nombre}</h3>
-                <p style={{ margin: '4px 0', fontSize: '14px' }}>
-                  <strong>Plazas libres:</strong> {parking.plazasLibres} / {parking.plazasTotales}
-                </p>
-                <p style={{ margin: '4px 0', fontSize: '14px' }}>
-                  <strong>Ocupación:</strong> {parking.porcentajeOcupacion.toFixed(0)}%
-                </p>
-                <button
-                  onClick={() => onParkingSelect(parking)}
-                  style={{
-                    marginTop: '8px',
-                    padding: '6px 12px',
-                    backgroundColor: '#2563eb',
+        {parkings.map((parking) => {
+          const statusColor = getOccupancyColor(parking.porcentajeOcupacion);
+          return (
+            <Marker
+              key={parking.id}
+              ref={(ref) => {
+                markerRefs.current[parking.id] = ref;
+              }}
+              position={[parking.latitud, parking.longitud]}
+              icon={createCustomIcon(statusColor)}
+              eventHandlers={{
+                click: () => onParkingSelect(parking)
+              }}
+            >
+              <Popup maxWidth={280} minWidth={240}>
+                <div style={{ padding: '4px', fontFamily: '"Outfit", sans-serif' }}>
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 700 }}>{parking.nombre}</h3>
+                  <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span>📍</span> {parking.direccion || 'Vigo, España'}
+                  </p>
+                  
+                  <div style={{ 
+                    background: `linear-gradient(135deg, ${statusColor} 0%, ${statusColor}dd 100%)`,
+                    padding: '12px',
+                    borderRadius: '12px',
                     color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Ver detalles
-                </button>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+                    textAlign: 'center',
+                    marginBottom: '12px',
+                    boxShadow: `0 4px 12px ${statusColor}44`
+                  }}>
+                    <div style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
+                      {getOccupancyLabel(parking.porcentajeOcupacion)}
+                    </div>
+                    <div style={{ fontSize: '24px', fontWeight: 800 }}>{parking.porcentajeOcupacion.toFixed(0)}%</div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.03)', padding: '8px', borderRadius: '8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '10px', color: '#64748b' }}>Libres</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700 }}>{parking.plazasLibres}</div>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.03)', padding: '8px', borderRadius: '8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '10px', color: '#64748b' }}>Totales</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700 }}>{parking.plazasTotales}</div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleGetDirections(parking)}
+                    className="btn-premium"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                      color: 'white',
+                      fontSize: '13px',
+                      borderRadius: '10px'
+                    }}
+                  >
+                    <span>🗺️</span>
+                    <span>Cómo llegar</span>
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );
