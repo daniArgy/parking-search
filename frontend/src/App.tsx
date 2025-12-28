@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MapComponent from './components/MapComponent';
 import SearchBar from './components/SearchBar';
-import ParkingDetail from './components/ParkingDetail';
 import ParkingList from './components/ParkingList';
 import Notification from './components/Notification';
 import { parkingService } from './services/parkingService';
@@ -16,6 +15,7 @@ function App() {
   const [isLocating, setIsLocating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [isSearchBarVisible, setIsSearchBarVisible] = useState(true);
 
   useEffect(() => {
     loadParkings();
@@ -90,7 +90,7 @@ function App() {
         });
       } else {
         // Fallback to basic parking filtering if no address found
-        const filtered = parkings.filter(p => 
+        const filtered = parkings.filter((p: Parking) => 
           p.nombre.toLowerCase().includes(query.toLowerCase()) ||
           p.direccion.toLowerCase().includes(query.toLowerCase())
         );
@@ -109,61 +109,68 @@ function App() {
     }
   };
 
-  return (
-    <div className="App" style={{ height: '100vh', width: '100vw', position: 'relative' }}>
-      {loading ? (
+  const handleMapMoveStateChange = (isMoving: boolean) => {
+    // Hide search bar when map is moving for better navigation experience
+    setIsSearchBarVisible(!isMoving);
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-container" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        gap: '20px',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+      }}>
         <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          gap: '20px',
-          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '3px solid rgba(99, 102, 241, 0.1)',
-            borderTop: '3px solid var(--primary)',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} />
-          <style>{`
-            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-          `}</style>
-          <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.5px' }}>
-            Descubriendo parkings...
-          </div>
-        </div>
-      ) : (
-        <>
-          <MapComponent
-            parkings={parkings}
-            selectedParking={selectedParking}
-            onParkingSelect={setSelectedParking}
-            userLocation={userLocation}
-            searchLocation={searchLocation}
+          width: '40px',
+          height: '40px',
+          border: '3px solid rgba(99, 102, 241, 0.1)',
+          borderTop: '3px solid #6366f1',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        <p style={{ fontSize: '18px', fontWeight: 600, color: '#64748b' }}>Buscando plazas libres en Vigo...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="App">
+      <SearchBar 
+        onGeolocate={handleGeolocate} 
+        onSearch={handleSearch}
+        isLocating={isLocating}
+        isVisible={isSearchBarVisible}
+      />
+      
+      <main style={{ height: '100%', width: '100%' }}>
+        <MapComponent
+          parkings={parkings}
+          selectedParking={selectedParking}
+          onParkingSelect={setSelectedParking}
+          onMapMoveStateChange={handleMapMoveStateChange}
+          userLocation={userLocation}
+          searchLocation={searchLocation}
+        />
+        
+        <ParkingList
+          parkings={parkings}
+          onParkingSelect={setSelectedParking}
+          selectedParking={selectedParking}
+        />
+        {notification && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onClose={() => setNotification(null)}
           />
-          <SearchBar
-            onGeolocate={handleGeolocate}
-            onSearch={handleSearch}
-            isLocating={isLocating}
-          />
-          <ParkingList
-            parkings={parkings}
-            onParkingSelect={setSelectedParking}
-            selectedParking={selectedParking}
-          />
-          {notification && (
-            <Notification
-              message={notification.message}
-              type={notification.type}
-              onClose={() => setNotification(null)}
-            />
-          )}
-        </>
-      )}
+        )}
+      </main>
     </div>
   );
 }

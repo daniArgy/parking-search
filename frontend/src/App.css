@@ -19,15 +19,14 @@
   padding: 0;
 }
 
-body {
-  font-family: "Outfit", -apple-system, sans-serif;
-  color: var(--text-main);
-  background-color: #f1f5f9;
-  -webkit-font-smoothing: antialiased;
+html, body {
+  height: 100%;
+  overflow: hidden;
 }
 
 .App {
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   overflow: hidden;
   position: relative;

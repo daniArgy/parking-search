@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { Parking } from '../types/Parking';
 import { getOccupancyColor, getOccupancyLabel } from '../utils/parkingUtils';
@@ -9,17 +9,21 @@ interface MapComponentProps {
   parkings: Parking[];
   selectedParking: Parking | null;
   onParkingSelect: (parking: Parking) => void;
+  onMapMoveStateChange?: (isMoving: boolean) => void;
   userLocation: [number, number] | null;
   searchLocation: [number, number] | null;
 }
 
 // Fix for default marker icon in Leaflet with React
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
+// This needs to be done once, but it's safe here
+if (typeof window !== 'undefined') {
+  delete (L.Icon.Default.prototype as any)._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  });
+}
 
 const createCustomIcon = (color: string) => {
   return L.divIcon({
@@ -37,11 +41,23 @@ const createCustomIcon = (color: string) => {
   });
 };
 
-const MapUpdater: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
+const MapHandler: React.FC<{ 
+  center: [number, number]; 
+  zoom: number;
+  onMoveChange?: (isMoving: boolean) => void;
+}> = ({ center, zoom, onMoveChange }) => {
   const map = useMap();
+  
   useEffect(() => {
-    map.setView(center, zoom);
+    // Only set view if center or zoom references change (which now only happens on intent)
+    map.setView(center, zoom, { animate: true });
   }, [center, zoom, map]);
+
+  useMapEvents({
+    movestart: () => onMoveChange?.(true),
+    moveend: () => onMoveChange?.(false),
+  });
+
   return null;
 };
 
@@ -49,6 +65,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   parkings,
   selectedParking,
   onParkingSelect,
+  onMapMoveStateChange,
   userLocation,
   searchLocation
 }) => {
@@ -65,7 +82,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     if (selectedParking && markerRefs.current[selectedParking.id]) {
       const marker = markerRefs.current[selectedParking.id];
       if (marker) {
-        // Small timeout to allow MapUpdater to finish panning/zooming
+        // Small timeout to allow MapHandler to finish panning/zooming
         setTimeout(() => {
           marker.openPopup();
         }, 100);
@@ -73,11 +90,17 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   }, [selectedParking]);
 
-  const center = selectedParking
-    ? [selectedParking.latitud, selectedParking.longitud] as [number, number]
-    : searchLocation || userLocation || defaultCenter;
+  const center = React.useMemo<[number, number]>(() => {
+    if (selectedParking) return [selectedParking.latitud, selectedParking.longitud];
+    if (searchLocation) return searchLocation;
+    if (userLocation) return userLocation;
+    return defaultCenter;
+  }, [selectedParking, searchLocation, userLocation]);
 
-  const zoom = (selectedParking || searchLocation || userLocation) ? 16 : defaultZoom;
+  const zoom = React.useMemo(() => {
+    if (selectedParking || searchLocation || userLocation) return 16;
+    return defaultZoom;
+  }, [selectedParking, searchLocation, userLocation]);
 
   return (
     <div style={{ height: '100%', width: '100%' }}>
@@ -91,7 +114,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapUpdater center={center} zoom={zoom} />
+        <MapHandler center={center} zoom={zoom} onMoveChange={onMapMoveStateChange} />
         
         {userLocation && (
           <Marker position={userLocation}>
@@ -104,7 +127,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
           return (
             <Marker
               key={parking.id}
-              ref={(ref) => {
+              ref={(ref: L.Marker | null) => {
                 markerRefs.current[parking.id] = ref;
               }}
               position={[parking.latitud, parking.longitud]}
